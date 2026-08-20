@@ -1,0 +1,28 @@
+{
+  "name": "devbuddy",
+  "version": "1.0.0",
+  "description": "social media for developer",
+  "keywords": [
+    "nodejs",
+    "javascript"
+  ],
+  "homepage": "https://github.com/Shashikumar19/DevBuddy#readme",
+  "bugs": {
+    "url": "https://github.com/Shashikumar19/DevBuddy/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Shashikumar19/DevBuddy.git"
+  },
+  "license": "ISC",
+  "author": "Shashikumar Lamani",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+  "start": "node src/app.js",
+  "dev": "nodemon src/app.js"
+  },
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}
