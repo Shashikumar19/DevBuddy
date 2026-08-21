@@ -20,13 +20,57 @@ app.post("/signup", async (req, res) => {
 
 })
 
+// delete user using findByIdAndDelete
+app.delete('/user', async (req, res) => {
+    const userId = req.body.userId;
+    try {
+        const deleted = await User.findByIdAndDelete(userId);
+        console.log(deleted);
+        if (!deleted) {
+            res.status(404).send('User not found');
+        } else {
+            res.send('user deleted successfully');
+        }
+
+    } catch (error) {
+        res.status(500).send('something went wrong')
+    }
+
+
+})
+
+app.patch('/user', async (req, res) => {
+    const data = req.body;
+    const email = req.body.email;
+    try {
+        const updatUser = await User.findOneAndUpdate({email}, data,{returnDocument:"after"});
+        console.log("--+++>",updatUser)
+        res.send(updatUser)
+    } catch (error) {
+        console.log(error)
+        res.status(500).send("something went wrong")
+    }
+})
+// Update using findByIdAndUpdate
+app.patch('/user', async (req, res) => {
+    const data = req.body;
+    const userId = req.body.userId;
+    try {
+        const updatUser = await User.findByIdAndUpdate(userId, data,{returnDocument:"after"});
+        console.log("-->",updatUser)
+        res.send(updatUser)
+    } catch (error) {
+        console.log(error)
+        res.status(500).send("something went wrong")
+    }
+})
 //find the user using findById method
 app.get('/user', async (req, res) => {
-    const _id = req.body._id;
+    const _id = req.body.userId;
 
     try {
         console.log(_id);
-        const user = await User.findById({ _id:_id });
+        const user = await User.findById(_id);
         if (!user) {
             res.status(404).send("user not found");
         } else {
