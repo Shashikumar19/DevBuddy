@@ -1,37 +1,32 @@
-console.log("starting the application");
 const express = require('express');
-const { userAuth, adminAuth } = require('./middleware/middleware')
+const {connectDB} =require('./config/database');
+const {User}= require('./models/user')
 const app = express();
+//middleware to convert from json to javascript object 
+app.use(express.json());
 
-//request handler
-// multiple route handlers
-app.use('/', (error, req, res, next) => {
+app.post("/signup",async (req,res)=>{
 
-    if (error) {
-        res.send('Something went wrong')
-    }
-})
-
-app.get('/user', (req, res, next) => {
-
-    // throw Error('Intentailnal error')
-    // res.send('user_Loged in successfully');
-    next();
-})
-
-app.get('/user',(req,res)=>{
-    res.send("resolved")
-})
-
-app.use('/', (error, req, res, next) => {
-
-    if (error) {
-        res.status(500).send('Something went wrong')
-    }
+try{
+    // instance of the model
+    const addUser = new User(req.body);
+     await addUser.save();
+    console.log("Data saved on the database")
+    res.send('User successfully signedup');
+}catch(error){
+    res.status(500).send('error while creating user')
+}
+   
+    
 })
 
 
-
-app.listen(3000, () => {
+connectDB()
+.then(()=>{
+    console.log("connected to database");
+ app.listen(3000, () => {
     console.log("App running on the 3000 port");
+  })
+}).catch((error)=>{
+    console.log("error while connecting the Database")
 })
