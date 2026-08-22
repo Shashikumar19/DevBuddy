@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
+const validator = require('validator')
 
 const userSchema = new Schema({
     firstName: {
@@ -12,6 +13,7 @@ const userSchema = new Schema({
     },
     lastName: {
         type: String,
+        required: true,
         minLength: 4,
         maxLength: 24,
         trim: true,
@@ -21,9 +23,13 @@ const userSchema = new Schema({
         type: String,
         required: true,
         minLength: 6,
-        maxLength: 25,
+        maxLength: 65,
         trim: true,
-        match: /^[a-zA-Z0-9]+[@]*[a-zA-Z0-9]+$/
+        validate(data){
+            if(!validator.isStrongPassword(data)){
+                throw new Error('Enter string pasword',data)
+            }
+        }
     },
     email: {
         type: String,
@@ -31,7 +37,11 @@ const userSchema = new Schema({
         unique: true,
         lowercase: true,
         trim: true,
-        match: /^[a-zA-Z0-9._%+-]+@[a-zA-Z]+\.[a-zA-Z]{2,}$/
+        validate(data){
+            if(!validator.isEmail(data)) {
+                throw new Error('Enter valid Email',data);
+            };
+        }
     },
     age: {
         type: String,
@@ -50,6 +60,11 @@ const userSchema = new Schema({
     photoUrl: {
         type: String,
         default: 'https://randomimageurl.com/assets/images/local/20260103_0531_Humorous%20Scene_simple_compose_01ke20wfqtfzt9ykbxzsxxsqzf_compressed_q80.jpeg',
+        validate(data){
+            if(!validator.isURL(data)){
+                  throw new Error('Enter correct URl',data)
+            }
+        }
     },
     about: {
         type: String,

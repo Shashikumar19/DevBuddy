@@ -1,28 +1,52 @@
 const express = require('express');
+const bcrypt = require('bcrypt')
 const { connectDB } = require('./config/database');
 const { User } = require('./models/user')
+const { validateSignup } = require('./utils/validator');
+
 const app = express();
-//middleware to convert from json to javascript object 
 app.use(express.json());
 
 app.post("/signup", async (req, res) => {
-const userdata = req.body;
 
-// const alloweddata = ['firstName','password','email','age','gender','photoUrl','about','skill'];
-// const createAllowed = Object.keys(userdata).every((key)=> alloweddata.includes(userdata));
-
+    const { firstName, lastName, password, email, gender } = req.body;
 
     try {
-        // instance of the model
-        const addUser = new User(req.body);
+        validateSignup(req);
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const addUser = new User({
+            firstName,
+            lastName,
+            password: hashedPassword,
+            email,
+            gender
+        });
         await addUser.save();
+        await User.init();
         console.log("Data saved on the database")
         res.send('User successfully signedup');
     } catch (error) {
-        res.status(400).send('[Error in creating user]:'+error)
+        res.status(400).send('[Error]:' + error)
     }
+})
 
+app.post('/login', async (req, res) => {
+    const { email, password } = req.body;
 
+    try {
+        // check the user existing the existing in the DB
+        const user = await User.findOne({ email: email });
+        if (!user) {
+            throw new Error('user does not exist');
+        }
+        const isValidUser = await bcrypt.compare(password, user?.password);
+        if (!isValidUser) {
+            throw new Error("Invalid Credentials")
+        }
+        res.send('user login successfull')
+    } catch (error) {
+        res.status(401).send('[Error]:' + error)
+    }
 })
 
 // delete user using findByIdAndDelete
@@ -57,23 +81,26 @@ app.delete('/user', async (req, res) => {
 //     }
 // })
 // Update using findByIdAndUpdate
-app.patch('/user', async (req, res) => {
+app.patch('/user/:userId', async (req, res) => {
     const data = req.body;
-    
-    const userId = req.body.userId;
-    try {
-       const alloweddata = ['age','gender','photoUrl','about','skill'];
-       const updateAllowed = Object.keys(userdata).every((key)=> alloweddata.includes(userdata));
+    const userId = req.params?.userId;
 
-        if(!updateAllowed){
+    try {
+        const alloweddata = ['age', 'gender', 'photoUrl', 'about', 'skill'];
+        const updateAllowed = Object.keys(data).every((key) => alloweddata.includes(key));
+
+        if (!updateAllowed) {
             throw new Error("Update is not allowed")
         }
-        const updatUser = await User.findByIdAndUpdate(userId, data,{returnDocument:"after",runValidators:true});
-        console.log("-->",updatUser)
+        if (data?.skill.length > 10) {
+            throw new Error('maximum skill allowed is 10')
+        }
+        const updatUser = await User.findByIdAndUpdate(userId, data, { returnDocument: "after", runValidators: true });
+        console.log("-->", updatUser)
         res.send(updatUser)
     } catch (error) {
         console.log(error)
-        res.status(400).send("[Error]:"+error)
+        res.status(400).send("[Error]:" + error)
     }
 })
 //find the user using findById method
@@ -147,5 +174,5 @@ connectDB()
             console.log("App running on the 3000 port");
         })
     }).catch((error) => {
-        console.log("error while connecting the Database",error.message)
+        console.log("error while connecting the Database", error.message)
     })
