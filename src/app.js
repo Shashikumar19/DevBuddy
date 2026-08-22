@@ -6,6 +6,11 @@ const app = express();
 app.use(express.json());
 
 app.post("/signup", async (req, res) => {
+const userdata = req.body;
+
+// const alloweddata = ['firstName','password','email','age','gender','photoUrl','about','skill'];
+// const createAllowed = Object.keys(userdata).every((key)=> alloweddata.includes(userdata));
+
 
     try {
         // instance of the model
@@ -14,7 +19,7 @@ app.post("/signup", async (req, res) => {
         console.log("Data saved on the database")
         res.send('User successfully signedup');
     } catch (error) {
-        res.status(500).send('error while creating user')
+        res.status(400).send('[Error in creating user]:'+error)
     }
 
 
@@ -39,29 +44,36 @@ app.delete('/user', async (req, res) => {
 
 })
 
-app.patch('/user', async (req, res) => {
-    const data = req.body;
-    const email = req.body.email;
-    try {
-        const updatUser = await User.findOneAndUpdate({email}, data,{returnDocument:"after"});
-        console.log("--+++>",updatUser)
-        res.send(updatUser)
-    } catch (error) {
-        console.log(error)
-        res.status(500).send("something went wrong")
-    }
-})
+// app.patch('/user', async (req, res) => {
+//     const data = req.body;
+//     const email = req.body.email;
+//     try {
+//         const updatUser = await User.findOneAndUpdate({email}, data,{returnDocument:"after"});
+//         console.log("--+++>",updatUser)
+//         res.send(updatUser)
+//     } catch (error) {
+//         console.log(error)
+//         res.status(500).send("something went wrong")
+//     }
+// })
 // Update using findByIdAndUpdate
 app.patch('/user', async (req, res) => {
     const data = req.body;
+    
     const userId = req.body.userId;
     try {
-        const updatUser = await User.findByIdAndUpdate(userId, data,{returnDocument:"after"});
+       const alloweddata = ['age','gender','photoUrl','about','skill'];
+       const updateAllowed = Object.keys(userdata).every((key)=> alloweddata.includes(userdata));
+
+        if(!updateAllowed){
+            throw new Error("Update is not allowed")
+        }
+        const updatUser = await User.findByIdAndUpdate(userId, data,{returnDocument:"after",runValidators:true});
         console.log("-->",updatUser)
         res.send(updatUser)
     } catch (error) {
         console.log(error)
-        res.status(500).send("something went wrong")
+        res.status(400).send("[Error]:"+error)
     }
 })
 //find the user using findById method
@@ -135,5 +147,5 @@ connectDB()
             console.log("App running on the 3000 port");
         })
     }).catch((error) => {
-        console.log("error while connecting the Database")
+        console.log("error while connecting the Database",error.message)
     })
