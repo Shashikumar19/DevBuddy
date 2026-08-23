@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
-const validator = require('validator')
+const validator = require('validator');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken')
 
 const userSchema = new Schema({
     firstName: {
@@ -9,7 +11,7 @@ const userSchema = new Schema({
         minLength: 4,
         maxLength: 24,
         trim: true,
-        match: [/^[a-zA-Z]+$/,"firtname Must contain only charaters"]
+        match: [/^[a-zA-Z]+$/, "firtname Must contain only charaters"]
     },
     lastName: {
         type: String,
@@ -25,9 +27,9 @@ const userSchema = new Schema({
         minLength: 6,
         maxLength: 65,
         trim: true,
-        validate(data){
-            if(!validator.isStrongPassword(data)){
-                throw new Error('Enter string pasword',data)
+        validate(data) {
+            if (!validator.isStrongPassword(data)) {
+                throw new Error('Enter string pasword', data)
             }
         }
     },
@@ -37,9 +39,9 @@ const userSchema = new Schema({
         unique: true,
         lowercase: true,
         trim: true,
-        validate(data){
-            if(!validator.isEmail(data)) {
-                throw new Error('Enter valid Email',data);
+        validate(data) {
+            if (!validator.isEmail(data)) {
+                throw new Error('Enter valid Email', data);
             };
         }
     },
@@ -60,9 +62,9 @@ const userSchema = new Schema({
     photoUrl: {
         type: String,
         default: 'https://randomimageurl.com/assets/images/local/20260103_0531_Humorous%20Scene_simple_compose_01ke20wfqtfzt9ykbxzsxxsqzf_compressed_q80.jpeg',
-        validate(data){
-            if(!validator.isURL(data)){
-                  throw new Error('Enter correct URl',data)
+        validate(data) {
+            if (!validator.isURL(data)) {
+                throw new Error('Enter correct URl', data)
             }
         }
     },
@@ -84,7 +86,19 @@ const userSchema = new Schema({
         }
     }
 
-},{timestamps:true})
+}, { timestamps: true })
+
+userSchema.methods.getJWT = async function () {
+    const user = this;
+    const token = await jwt.sign({ _id: user._id }, "DevBuddy@2026/@@@|||", { expiresIn: "7d" });
+    return token;
+}
+userSchema.methods.validatePassword = async function (userPassword) {
+    const user = this;
+    const hashedPassword = user?.password;
+    const isValidUser = await bcrypt.compare(userPassword, hashedPassword);
+    return isValidUser;
+}
 
 const User = mongoose.model('User', userSchema);
 
