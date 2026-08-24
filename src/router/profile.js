@@ -30,8 +30,15 @@ profileRouter.patch('/profile/edit/', userAuth, async (req, res) => {
         })
 
         const data = await loggedInUser.save();
-        res.json({ message: 'user updated successfully',data})
-        
+        const filtedData = {};
+        for (key in data) {
+            if (allowedField.includes(key)) {
+                filtedData[key] = data[key];
+            }
+
+        }
+        res.json({ message: 'user updated successfully', data:filtedData })
+
     } catch (error) {
         res.status(400).send('Error:' + error.message);
     }
