@@ -46,7 +46,7 @@ const userSchema = new Schema({
         }
     },
     age: {
-        type: String,
+        type: Number,
         min: 18,
     },
     gender: {
@@ -87,7 +87,6 @@ const userSchema = new Schema({
     }
 
 }, { timestamps: true })
-
 userSchema.methods.getJWT = async function () {
     const user = this;
     const token = await jwt.sign({ _id: user._id }, "DevBuddy@2026/@@@|||", { expiresIn: "7d" });
@@ -99,6 +98,7 @@ userSchema.methods.validatePassword = async function (userPassword) {
     const isValidUser = await bcrypt.compare(userPassword, hashedPassword);
     return isValidUser;
 }
+
 
 const User = mongoose.model('User', userSchema);
 

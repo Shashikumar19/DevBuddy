@@ -1,22 +1,25 @@
-  ## authRouter
+## authRouter
  - POST /signup
  - POST /login
  - POST /logout
 
-  ## profileRouter
+## profileRouter
  - GET profile/view
  - PATCH /profile/edit
  - PATCH /Profile/password
 
-  ## connectionReuestRouter
+ ## connectionReuestRouter
+ ## POST request/send/:status/:userId
  - POST request/send/interested/:userId
  - POST request/send/ignored/:userId
+
+## POST request/review/:status/:requestId
  - POST request/review/accepted/:requestId
  - POST request/review/rejected/requestId
 
-  ## userRouter
+## userRouter
  - GET user/connections
- - GET user/request/
+ - GET /user/request/received
  - GET user/feed - gets you the user for connection
   
 

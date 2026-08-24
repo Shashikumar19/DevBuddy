@@ -1,6 +1,6 @@
 const express = require('express');
 const profileRouter = express.Router();
-const {userAuth} = require('../middleware/Auth')
+const { userAuth } = require('../middleware/Auth')
 
 profileRouter.get('/profile', userAuth, async (req, res) => {
     try {
@@ -14,4 +14,28 @@ profileRouter.get('/profile', userAuth, async (req, res) => {
     }
 })
 
-module.exports=profileRouter;
+profileRouter.patch('/profile/edit/', userAuth, async (req, res) => {
+    const payloadData = req.body;
+    try {
+        const allowedField = ['firstName', 'lastName', 'email', 'gender', 'photoUrl', 'about', 'skill', 'age'];
+        const isUpdateAllowed = Object.keys(payloadData).every((key) => allowedField.includes(key));
+
+        if (!isUpdateAllowed) {
+            throw new Error("Bad request update not allowed")
+        }
+
+        const loggedInUser = req.user;
+        Object.keys(payloadData).forEach((key) => {
+            loggedInUser[key] = payloadData[key];
+        })
+
+        const data = await loggedInUser.save();
+        res.json({ message: 'user updated successfully',data})
+        
+    } catch (error) {
+        res.status(400).send('Error:' + error.message);
+    }
+
+})
+
+module.exports = profileRouter;

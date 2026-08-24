@@ -9,9 +9,11 @@ app.use(cookiParser());
 const authRouter = require('./router/auth');
 const profileRouter = require('./router/profile');
 const requestRouter = require('./router/requests');
+const userRoutes = require('./router/user')
 app.use('/',authRouter);
 app.use('/',profileRouter);
 app.use('/',requestRouter);
+app.use('/',userRoutes);
 
 connectDB()
     .then(() => {

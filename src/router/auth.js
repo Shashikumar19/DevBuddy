@@ -1,7 +1,7 @@
 const express = require('express');
 const authRouter = express.Router();
 const { validateSignup } = require('../utils/validator');
-const {User} = require('../models/user');
+const { User } = require('../models/user');
 const bcrypt = require('bcrypt');
 
 authRouter.post("/signup", async (req, res) => {
@@ -20,8 +20,7 @@ authRouter.post("/signup", async (req, res) => {
         });
         await addUser.save();
         await User.init();
-        console.log("Data saved on the database")
-        res.send('User successfully signedup');
+        res.json({ message: 'User successfully signed up' });
     } catch (error) {
         res.status(400).send('Error:' + error.message)
     }
@@ -41,10 +40,15 @@ authRouter.post('/login', async (req, res) => {
         }
         const token = await user.getJWT();
         res.cookie('token', token, { expires: new Date(Date.now() + 10 * 3600000), httpOnly: true }); // 8hrs
-        res.send('user login successfull');
+        res.json({ message: 'logged in successfully', userName: user.firstName + " " + user.lastName });
     } catch (error) {
         res.status(401).send('Error:' + error)
     }
 })
 
-module.exports= authRouter;
+authRouter.post('/logout', (req, res) => {
+    res.clearCookie('token');
+    res.json({ message: 'Logged out successfully' })
+})
+
+module.exports = authRouter;
