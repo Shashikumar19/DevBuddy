@@ -2,7 +2,7 @@ const express = require('express');
 const profileRouter = express.Router();
 const { userAuth } = require('../middleware/Auth')
 
-profileRouter.get('/profile', userAuth, async (req, res) => {
+profileRouter.get('/profile/view', userAuth, async (req, res) => {
     try {
         const userData = req?.user;
         if (!userData) {
