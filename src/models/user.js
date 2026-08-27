@@ -11,7 +11,7 @@ const userSchema = new Schema({
         minLength: 4,
         maxLength: 24,
         trim: true,
-        match: [/^[a-zA-Z]+$/, "firtname Must contain only charaters"]
+        match: [/^[a-zA-Z ]+$/, "firtname Must contain only charaters"]
     },
     lastName: {
         type: String,

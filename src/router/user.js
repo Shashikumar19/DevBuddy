@@ -11,8 +11,11 @@ userRoutes.get('/user/request/received', userAuth, async (req, res) => {
         const connectionRequest = await Connectionrequest.find({
             toUserId: loggedInUser._id,
             status: 'intrested'
-        }).populate('fromUserId', fieldAllowedToView)
-        return res.json({ message: 'Data Fetched Successfully', data: connectionRequest })
+        }).populate('fromUserId', fieldAllowedToView);
+
+        // send only request Recived user data
+        const data = connectionRequest.map((raw)=> raw.fromUserId)
+        return res.json({ message: 'Data Fetched Successfully', data: data })
     } catch (error) {
         res.status(404).json({ message: error.message })
     }
@@ -34,9 +37,9 @@ userRoutes.get('/user/connections', userAuth, async (req, res) => {
                         status: 'accepted'
                     }]
             }).populate('toUserId', fieldAllowedToView).populate("fromUserId", fieldAllowedToView)
-        // validate the from user and repose the data
 
-        const data = connections.map((raw) => raw.fromUserId._id === loggedInUser._id ? raw.toUserId : raw.fromUserId)
+        // validate the from user and repose the data
+        const data = connections.map((raw) => raw.fromUserId._id.equals(loggedInUser._id) ? raw.toUserId : raw.fromUserId)
         res.json({ message: 'Connections fetched successfully', data: data })
     } catch (error) {
         res.status(400).json({ message: error.message })
