@@ -83,7 +83,6 @@ userRoutes.get('/user/feed', userAuth, async (req, res) => {
                 $and: [{ _id: { $nin: Array.from(hideUserId) }, },
                 { _id: { $ne: loggedInUser._id } }]
             }).select(fieldAllowedToView).skip(skip).limit(limit);
-        console.log("After filter", userFeed)
         res.json({ message: 'User Feed Fetched Successfully', data: userFeed })
 
     } catch (error) {
