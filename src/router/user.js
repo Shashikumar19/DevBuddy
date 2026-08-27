@@ -14,7 +14,17 @@ userRoutes.get('/user/request/received', userAuth, async (req, res) => {
         }).populate('fromUserId', fieldAllowedToView);
 
         // send only request Recived user data
-        const data = connectionRequest.map((raw)=> raw.fromUserId)
+        const data = connectionRequest.map((raw) => {
+            return {
+                _id: raw?._id,
+                firstName: raw.fromUserId?.firstName,
+                lastName: raw.fromUserId?.lastName,
+                gender: raw.fromUserId?.gender,
+                photoUrl: raw.fromUserId?.photoUrl,
+                about: raw.fromUserId?.about,
+                skill: raw.fromUserId?.skill
+            }
+        })
         return res.json({ message: 'Data Fetched Successfully', data: data })
     } catch (error) {
         res.status(404).json({ message: error.message })
@@ -64,24 +74,16 @@ userRoutes.get('/user/feed', userAuth, async (req, res) => {
             { $or: [{ toUserId: loggedInUser._id }, { fromUserId: loggedInUser._id }] })
 
         const hideUserId = new Set();
-
         connections.forEach((raw) => {
-            hideUserId.add(raw.fromUserId.toString());
-            hideUserId.add(raw.toUserId.toString());
+            hideUserId.add(raw.fromUserId?.toString());
+            hideUserId.add(raw.toUserId?.toString());
         })
-
         const userFeed = await User.find(
             {
-                $and: [{
-                    _id: {
-                        $nin: Array.from(hideUserId)
-                    },
-                    _id: {
-                        $nin: loggedInUser._id
-                    }
-                }]
+                $and: [{ _id: { $nin: Array.from(hideUserId) }, },
+                { _id: { $ne: loggedInUser._id } }]
             }).select(fieldAllowedToView).skip(skip).limit(limit);
-
+        console.log("After filter", userFeed)
         res.json({ message: 'User Feed Fetched Successfully', data: userFeed })
 
     } catch (error) {
