@@ -6,7 +6,7 @@ const bcrypt = require('bcrypt');
 
 authRouter.post("/signup", async (req, res) => {
 
-    const { firstName, lastName, password, email, gender } = req.body;
+    const { firstName, lastName, password, email } = req.body;
 
     try {
         validateSignup(req);
@@ -16,11 +16,12 @@ authRouter.post("/signup", async (req, res) => {
             lastName,
             password: hashedPassword,
             email,
-            gender
         });
-        await addUser.save();
+       const userSaved =  await addUser.save();
         await User.init();
-        res.json({ message: 'User successfully signed up' });
+        const token = await userSaved.getJWT();
+        res.cookie('token', token, { expires: new Date(Date.now() + 10 * 3600000), httpOnly: true });
+        res.json({ message: 'User successfully signed up' ,data:userSaved });
     } catch (error) {
         res.status(400).send('Error:' + error.message)
     }

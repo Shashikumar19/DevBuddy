@@ -12,9 +12,6 @@ function validateSignup(req) {
     if (!validate.isStrongPassword(password)) {
         throw new Error('Enter strong Password')
     }
-    if (!['female', 'male', 'others'].includes(gender.toLowerCase())) {
-        throw new Error('Enter valid gender')
-    }
 
 }
 

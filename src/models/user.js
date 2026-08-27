@@ -51,7 +51,6 @@ const userSchema = new Schema({
     },
     gender: {
         type: String,
-        required: true,
         lowercase: true,
         validate(data) {
             if (!['male', 'female', 'others'].includes(data)) return false
@@ -61,7 +60,7 @@ const userSchema = new Schema({
     },
     photoUrl: {
         type: String,
-        default: 'https://randomimageurl.com/assets/images/local/20260103_0531_Humorous%20Scene_simple_compose_01ke20wfqtfzt9ykbxzsxxsqzf_compressed_q80.jpeg',
+        default: 'https://img.magnific.com/free-vector/isolated-young-handsome-man-different-poses-white-background-illustration_632498-859.jpg?semt=ais_hybrid&w=740&q=80',
         validate(data) {
             if (!validator.isURL(data)) {
                 throw new Error('Enter correct URl', data)

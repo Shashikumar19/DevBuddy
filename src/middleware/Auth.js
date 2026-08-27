@@ -6,7 +6,7 @@ async function userAuth(req, res, next) {
     const cookies = req?.cookies;
     const { token } = cookies;
     if(!token){
-      throw new Error("Token is required")
+      res.status(401).json({message :"Token is required"})
     }
     const isValidUser = jwt.verify(token, "DevBuddy@2026/@@@|||");
     if (!isValidUser) {
