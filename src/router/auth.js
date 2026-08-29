@@ -3,6 +3,7 @@ const authRouter = express.Router();
 const { validateSignup } = require('../utils/validator');
 const { User } = require('../models/user');
 const bcrypt = require('bcrypt');
+const {verifyEmail} = require("../utils/sesClient")
 
 authRouter.post("/signup", async (req, res) => {
 
@@ -16,8 +17,10 @@ authRouter.post("/signup", async (req, res) => {
             lastName,
             password: hashedPassword,
             email,
-        });
-       const userSaved =  await addUser.save();
+        }); 
+        const verify = await verifyEmail(email);
+        console.log("verify email",verify)
+        const userSaved =  await addUser.save();
         await User.init();
         const token = await userSaved.getJWT();
         res.cookie('token', token, { expires: new Date(Date.now() + 10 * 3600000), httpOnly: true });

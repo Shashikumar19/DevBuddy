@@ -3,6 +3,8 @@ const requestRouter = express.Router();
 const { userAuth } = require('../middleware/auth');
 const Connectionrequest = require('../models/connectionrequest');
 const { validateConnectionRequest } = require('../utils/validator');
+const sendEmail = require("../utils/sendEmail");
+const { User } = require('../models/user');
 
 requestRouter.post('/request/send/:status/:toUserId', userAuth, async (req, res) => {
 
@@ -11,8 +13,11 @@ requestRouter.post('/request/send/:status/:toUserId', userAuth, async (req, res)
         const toUserId = req.params.toUserId;
         const status = req.params.status;
         const toUser = await validateConnectionRequest({ fromUserId, toUserId, status, res })
+        const receiverData = await User.findById(toUserId).select('firstName')
+        const emailData = await sendEmail.run(req.user.firstName,receiverData.firstName);
         const connectionRequest = new Connectionrequest({ fromUserId, toUserId, status });
         await connectionRequest.save();
+        console.log('emailData-->',emailData);
         res.json({ message: `${req.user.firstName} is sent connection request to ${toUser.firstName} successfully!` });
     } catch (error) {
         res.status(406).json({ message: error.message })
