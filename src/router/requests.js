@@ -18,7 +18,7 @@ requestRouter.post('/request/send/:status/:toUserId', userAuth, async (req, res)
         const connectionRequest = new Connectionrequest({ fromUserId, toUserId, status });
         await connectionRequest.save();
         console.log('emailData-->',emailData);
-        res.json({ message: `${req.user.firstName} is sent connection request to ${toUser.firstName} successfully!` });
+        return res.json({ message: `${req.user.firstName} is sent connection request to ${toUser.firstName} successfully!` });
     } catch (error) {
         res.status(406).json({ message: error.message })
     }

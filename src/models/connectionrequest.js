@@ -20,7 +20,7 @@ const connectionRequestSchema = new Schema({
             message: "validation failed for {PATH} with {VALUE} please eneter correct status"
         }
     }
-})
+},{timestamps:true})
 connectionRequestSchema.pre('save', function() {
     const fromUserId = this?.fromUserId;
     const toUserId = this?.toUserId;

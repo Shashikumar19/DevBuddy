@@ -3,6 +3,8 @@ const cookiParser = require('cookie-parser')
 const { connectDB } = require('./config/database');
 const cors = require('cors');
 require('dotenv').config()
+require("./utils/crobJob")
+
 const app = express();
 
 app.use(cors({
