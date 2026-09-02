@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 const validator = require('validator');
 const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken')
+const jwt = require('jsonwebtoken');
 
 const userSchema = new Schema({
     firstName: {
@@ -48,6 +48,12 @@ const userSchema = new Schema({
     age: {
         type: Number,
         min: 18,
+    },
+    isPremium:{
+       type:Boolean,
+       default:false
+    },membershipType: {
+        type:String,
     },
     gender: {
         type: String,
