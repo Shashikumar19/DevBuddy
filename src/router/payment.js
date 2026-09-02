@@ -59,12 +59,7 @@ paymentRouter.post('/payment/webhook', async (req, res) => {
             return res.status(400).json({ message: 'Invalid webhook' })
         }
         
-        // if (req.body.event === "payment.captured") {
-        //     console.log("Success")
-        // }
-        // if (req.body.event === "payment.failed") {
-        //     console.log("failed")
-        // }
+       
 
         // updated the payment status
 
@@ -75,10 +70,16 @@ paymentRouter.post('/payment/webhook', async (req, res) => {
     
         // update the user as premium and its plan
         const updateUser = await User.findById(payment.userId);
-        updateUser.isPremium = true;
-        updateUser.membershipType = payment.notes.plan;
-         await updateUser.save();
-      
+
+         if (req.body.event === "payment.captured") {
+            updateUser.isPremium = true;
+            updateUser.membershipType = payment.notes.plan;
+        }
+        if (req.body.event === "payment.failed") {
+             updateUser.isPremium = false;
+        }
+       
+         await updateUser.save(); 
         // return 200 response to razorpay
         return res.status(200).json({ message: 'payment details updated sucessfully' })
     } catch (error) {
