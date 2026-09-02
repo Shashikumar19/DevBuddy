@@ -58,26 +58,27 @@ paymentRouter.post('/payment/webhook', async (req, res) => {
         if (!isvalidWebhook) {
             return res.status(400).json({ message: 'Invalid webhook' })
         }
-        if (req.body.event === "payment.captured") {
-            console.log("Success")
-        }
-        if (req.body.event === "payment.failed") {
-            console.log("failed")
-        }
+        
+        // if (req.body.event === "payment.captured") {
+        //     console.log("Success")
+        // }
+        // if (req.body.event === "payment.failed") {
+        //     console.log("failed")
+        // }
 
         // updated the payment status
 
         const webhookData = req.body.payload.payment.entity;
-        const payment = await paymentModel.find({orderId:webhookData.order_id});
+        const payment = await paymentModel.findOne({orderId:webhookData.order_id});
         payment.status = webhookData.status;
         await payment.save();
-        console.log("paymentupdatd", payment)
+    
         // update the user as premium and its plan
         const updateUser = await User.findById(payment.userId);
         updateUser.isPremium = true;
         updateUser.membershipType = payment.notes.plan;
         const user = await updateUser.save();
-        console.log("userupdated", user)
+      
         // return 200 response to razorpay
         return res.status(200).json({ message: 'payment details updated sucessfully' })
     } catch (error) {
