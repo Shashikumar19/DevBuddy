@@ -19,7 +19,7 @@ function soketInitailization(server) {
             socket.join(roomId);
         })
 
-        socket.on('sendMessage', async ({ firstName, message, targetUser, userId  }) => {
+        socket.on('sendMessage', async ({ firstName, message, targetUser, userId,photoUrl  }) => {
 
             const roomId = generateRoomId(targetUser, userId)
 
@@ -41,7 +41,7 @@ function soketInitailization(server) {
                     messageContent: message
                 })
                 await chat.save();
-                io.to(roomId).emit("messageRecieved", { firstName, message })
+                io.to(roomId).emit("messageRecieved", { firstName, message, photoUrl })
 
             } catch(error) {
               console.log("socket error",error.message)
